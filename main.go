@@ -97,6 +97,8 @@ func startHTTPFlv(stream *rtmp.RtmpStream) {
 		log.Fatal(err)
 	}
 
+	//httpflv.NewServer 入參是一個要實現av.Handler的對像，返回的是一個初始化的對像服務
+	//RtmpStream這個struct是實現了av.Handler接口中的HandleReader HandleWriter兩個方法的，故可當參數傳入
 	hdlServer := httpflv.NewServer(stream)
 	go func() {
 		defer func() {
@@ -166,9 +168,13 @@ func main() {
 		if app.Hls {
 			hlsServer = startHls()
 		}
+
+		//HTTPFlv提供拉流服務
 		if app.Flv {
 			startHTTPFlv(stream)
 		}
+
+		//提供創建訪間號等服務
 		if app.Api {
 			startAPI(stream)
 		}

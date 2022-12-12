@@ -97,6 +97,7 @@ func (s *Server) Serve(listener net.Listener) (err error) {
 	}
 }
 
+//LXQ:每當有一個推流端聯接到我們的RTMP服務后，會被handleConn處理
 func (s *Server) handleConn(conn *core.Conn) error {
 	if err := conn.HandshakeServer(); err != nil {
 		conn.Close()
@@ -132,6 +133,8 @@ func (s *Server) handleConn(conn *core.Conn) error {
 			}
 			name = key
 		}
+		//name是推流端通過API獲得的房間的token;
+		//返回的channel即token對應的房間名稱，如movie
 		channel, err := configure.RoomKeys.GetChannel(name)
 		if err != nil {
 			err := fmt.Errorf("invalid key err=%s", err.Error())

@@ -61,15 +61,39 @@ type ServerCfg struct {
 }
 
 // default config
+//var defaultConf = ServerCfg{
+//	ConfigFile:      "livego.yaml",
+//	FLVArchive:      false,
+//	RTMPNoAuth:      false,
+//	RTMPAddr:        ":1935",
+//	HTTPFLVAddr:     ":7001",
+//	HLSAddr:         ":7002",
+//	HLSKeepAfterEnd: false,
+//	APIAddr:         ":8090",
+//	WriteTimeout:    10,
+//	ReadTimeout:     10,
+//	EnableTLSVerify: true,
+//	GopNum:          1,
+//	Server: Applications{{
+//		Appname:    "live",
+//		Live:       true,
+//		Hls:        true,
+//		Flv:        true,
+//		Api:        true,
+//		StaticPush: nil,
+//	}},
+//}
+
+//LXQ: 開發環境，換一下端口，正式環境，用上面的配置
 var defaultConf = ServerCfg{
 	ConfigFile:      "livego.yaml",
 	FLVArchive:      false,
 	RTMPNoAuth:      false,
-	RTMPAddr:        ":1935",
-	HTTPFLVAddr:     ":7001",
-	HLSAddr:         ":7002",
+	RTMPAddr:        ":11935",
+	HTTPFLVAddr:     ":17001",
+	HLSAddr:         ":17002",
 	HLSKeepAfterEnd: false,
-	APIAddr:         ":8090",
+	APIAddr:         ":18090",
 	WriteTimeout:    10,
 	ReadTimeout:     10,
 	EnableTLSVerify: true,
@@ -97,6 +121,10 @@ var (
 func initLog() {
 	if l, err := log.ParseLevel(Config.GetString("level")); err == nil {
 		log.SetLevel(l)
+
+		//LXQ:為方便調試，hardcode DebugLevel
+		log.SetLevel(log.DebugLevel)
+
 		log.SetReportCaller(l == log.DebugLevel)
 	}
 }

@@ -61,7 +61,9 @@ func (r *RoomKeysType) SetKey(channel string) (key string, err error) {
 	}
 
 	for {
-		key = uid.RandStringRunes(48)
+		//LXQ:為便于調試，先全把key設為與房間號相同
+		key = channel
+		//key = uid.RandStringRunes(48)
 		if _, found := r.localCache.Get(key); !found {
 			r.localCache.SetDefault(channel, key)
 			r.localCache.SetDefault(key, channel)

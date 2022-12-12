@@ -16,11 +16,15 @@ type Server struct {
 	handler av.Handler
 }
 
+//LXQ:publisher 與 player 均使用此結構體
+//其中Key:由 appname/home組成，ex:   live/movie
+//ID，代理publisher 或 player 的一個終端
 type stream struct {
 	Key string `json:"key"`
 	Id  string `json:"id"`
 }
 
+//LXQ: streams表示流的集合結果，Publishers表示，當前直播服務器中所有 發布者
 type streams struct {
 	Publishers []stream `json:"publishers"`
 	Players    []stream `json:"players"`
@@ -32,11 +36,16 @@ func NewServer(h av.Handler) *Server {
 	}
 }
 
+//提供HTTPFlv服務
 func (server *Server) Serve(l net.Listener) error {
 	mux := http.NewServeMux()
+
+	//處理每一個player的播放請求
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		server.handleConn(w, r)
 	})
+
+	//可用于監聽每個livego服務器的負載，及publisher與 player數量
 	mux.HandleFunc("/streams", func(w http.ResponseWriter, r *http.Request) {
 		server.getStream(w, r)
 	})
@@ -46,7 +55,7 @@ func (server *Server) Serve(l net.Listener) error {
 	return nil
 }
 
-// 获取发布和播放器的信息
+// 获取所有 publisher 和 每個publisher的player信息
 func (server *Server) getStreams(w http.ResponseWriter, r *http.Request) *streams {
 	rtmpStream := server.handler.(*rtmp.RtmpStream)
 	if rtmpStream == nil {
@@ -92,6 +101,7 @@ func (server *Server) getStream(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp)
 }
 
+//HTTPFlv每一個client 的請求，將來由handleConn來處理
 func (server *Server) handleConn(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -101,10 +111,12 @@ func (server *Server) handleConn(w http.ResponseWriter, r *http.Request) {
 
 	url := r.URL.String()
 	u := r.URL.Path
+	//LXQ: 不是.FLV結尾的報錯，并返回
 	if pos := strings.LastIndex(u, "."); pos < 0 || u[pos:] != ".flv" {
 		http.Error(w, "invalid path", http.StatusBadRequest)
 		return
 	}
+
 	path := strings.TrimSuffix(strings.TrimLeft(u, "/"), ".flv")
 	paths := strings.SplitN(path, "/", 2)
 	log.Debug("url:", u, "path:", path, "paths:", paths)

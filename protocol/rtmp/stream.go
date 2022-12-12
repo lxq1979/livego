@@ -17,6 +17,8 @@ var (
 	EmptyID = ""
 )
 
+//LXQ:我的理解，此處的map應當放的是，存的每一個推流的stream
+//RtmpStream要實現 interface av.Handler
 type RtmpStream struct {
 	streams *sync.Map //key
 }
@@ -76,10 +78,12 @@ func (rs *RtmpStream) GetStreams() *sync.Map {
 
 func (rs *RtmpStream) CheckAlive() {
 	for {
+		//定時檢查推流房間是否還活著，未存活，就從stream map中清掉；
 		<-time.After(5 * time.Second)
 		rs.streams.Range(func(key, val interface{}) bool {
 			v := val.(*Stream)
 			if v.CheckAlive() == 0 {
+				log.Infof("Will delete stream key:%s ", key)
 				rs.streams.Delete(key)
 			}
 			return true
@@ -91,7 +95,7 @@ type Stream struct {
 	isStart bool
 	cache   *cache.Cache
 	r       av.ReadCloser
-	ws      *sync.Map
+	ws      *sync.Map //存的是 對當前流client 的writer,
 	info    av.Info
 }
 
@@ -126,6 +130,7 @@ func (s *Stream) GetWs() *sync.Map {
 	return s.ws
 }
 
+//LXQ:所有的當前流的client writer 遍歷一次進行，感覺是要進行流複製
 func (s *Stream) Copy(dst *Stream) {
 	dst.info = s.info
 	s.ws.Range(func(key, val interface{}) bool {
@@ -142,6 +147,7 @@ func (s *Stream) AddReader(r av.ReadCloser) {
 	go s.TransStart()
 }
 
+//把要拉取前steam的client writer增加到當前流的 訂閱 對向清單中去；
 func (s *Stream) AddWriter(w av.WriteCloser) {
 	info := w.Info()
 	pw := &PackWriterCloser{w: w}
