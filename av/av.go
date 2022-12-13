@@ -86,10 +86,12 @@ type VideoPacketHeader interface {
 	CompositionTime() int32
 }
 
+//de muxer 多數調制解調器
 type Demuxer interface {
 	Demux(*Packet) (ret *Packet, err error)
 }
 
+//muxer 多數調制器
 type Muxer interface {
 	Mux(*Packet, io.Writer) error
 }

@@ -89,6 +89,7 @@ func (flvWriter *FLVWriter) DropPacket(pktQue chan *av.Packet, info av.Info) {
 	log.Debug("packet queue len: ", len(pktQue))
 }
 
+//LXQ:將要寫到客戶端的Packet 進到packet channel
 func (flvWriter *FLVWriter) Write(p *av.Packet) (err error) {
 	err = nil
 	if flvWriter.closed {
@@ -111,6 +112,7 @@ func (flvWriter *FLVWriter) Write(p *av.Packet) (err error) {
 	return
 }
 
+//LXQ: 將向player 發送拉流的packet
 func (flvWriter *FLVWriter) SendPacket() error {
 	for {
 		p, ok := <-flvWriter.packetQueue

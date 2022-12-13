@@ -122,6 +122,7 @@ func (s *Server) handleConn(conn *core.Conn) error {
 	}
 
 	log.Debugf("handleConn: IsPublisher=%v", connServer.IsPublisher())
+	//LXQ:還有不是Publisher 連入的情況嗎？
 	if connServer.IsPublisher() {
 		if configure.Config.GetBool("rtmp_noauth") {
 			key, err := configure.RoomKeys.GetKey(name)

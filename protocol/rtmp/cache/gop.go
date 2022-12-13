@@ -6,6 +6,7 @@ import (
 	"github.com/gwuhaolin/livego/av"
 )
 
+//GOP : group of pictures
 var (
 	maxGOPCap    int = 1024
 	ErrGopTooBig     = fmt.Errorf("gop to big")

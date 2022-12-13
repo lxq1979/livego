@@ -60,13 +60,14 @@ func (rs *RtmpStream) HandleWriter(w av.WriteCloser) {
 	log.Debugf("HandleWriter: info[%v]", info)
 
 	var s *Stream
+	//? 在流清單中查找要拉流的key，這個理論上一定存在啊？？
 	item, ok := rs.streams.Load(info.Key)
 	if !ok {
 		log.Debugf("HandleWriter: not found create new info[%v]", info)
 		s = NewStream()
 		rs.streams.Store(info.Key, s)
 		s.info = info
-	} else {
+	} else { //正常應當時走到這里
 		s = item.(*Stream)
 		s.AddWriter(w)
 	}

@@ -117,9 +117,10 @@ func (server *Server) handleConn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//處理后的URL 127.0.0.1:7001/live/monitor
 	path := strings.TrimSuffix(strings.TrimLeft(u, "/"), ".flv")
 	paths := strings.SplitN(path, "/", 2)
-	log.Debug("url:", u, "path:", path, "paths:", paths)
+	log.Debug("url:", u, " path:", path, " paths:", paths)
 
 	if len(paths) != 2 {
 		http.Error(w, "invalid path", http.StatusBadRequest)
