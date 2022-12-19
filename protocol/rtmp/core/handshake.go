@@ -140,6 +140,27 @@ func (conn *Conn) HandshakeClient() (err error) {
 	return
 }
 
+/**
+LXQ: RTMP握手的規則，參【RTMP 协议：为什么直播推流协议都爱用它】,之握手篇
+C0,S0 1byte version 3
+C1,S1  1536byte 包括
+	time 4byte
+	zero 4byte must 全 0
+	random 1528bytes 本字段可以包含任何值。由于握手的双方需要区分另一端，此字段填充的数据必须足够随机（以防止与其他握手端混淆）。不过没有必要为此使用加密数据或动态数据。
+
+C2 和 S2（1536 bytes）
+	time（4 bytes）：本字段表示对端发送的时间戳（对C2来说是S1 ,对S2来说是C1）
+	time2（4 bytes）：本字段表示接收对端发送过来的握手包的时间戳
+	random（1528 bytes）：本字段包含对端发送过来的随机数据（对C2来说是S1，对S2来说是C1）
+
+整個過程
+为了方便开发，在实现上，我们选用以下握手流程，这样服务端可以连续发送S0,S1和S2：
+Client--> Server : 发送一个创建流的请求(C0、C1)
+Server--> Client : 返回一个流的索引号( S0、S1、S2)。
+Client--> Server : 开始发送 (C2)
+Client--> Server : 发送音视频数据(这些包用流的索引号来唯一标识)
+
+*/
 func (conn *Conn) HandshakeServer() (err error) {
 	var random [(1 + 1536*2) * 2]byte
 
@@ -157,10 +178,14 @@ func (conn *Conn) HandshakeServer() (err error) {
 
 	// < C0C1
 	conn.Conn.SetDeadline(time.Now().Add(timeout))
+	//LXQ:接收client發過來的 C0C1
 	if _, err = io.ReadFull(conn.rw, C0C1); err != nil {
 		return
 	}
+
 	conn.Conn.SetDeadline(time.Now().Add(timeout))
+	//lxq: 在 C0 中，该字段标识了客户端请求的 RTMP 版本。
+	//在 S0 中，这个字段是服务器的 RTMP 版本。这个版本被定义成 3
 	if C0[0] != 3 {
 		err = fmt.Errorf("rtmp: handshake version=%d invalid", C0[0])
 		return
@@ -189,6 +214,7 @@ func (conn *Conn) HandshakeServer() (err error) {
 
 	// > S0S1S2
 	conn.Conn.SetDeadline(time.Now().Add(timeout))
+	//LXQ:向client發S0S1S2
 	if _, err = conn.rw.Write(S0S1S2); err != nil {
 		return
 	}
@@ -197,7 +223,7 @@ func (conn *Conn) HandshakeServer() (err error) {
 		return
 	}
 
-	// < C2
+	//LXQ: 服務端接收 < C2
 	conn.Conn.SetDeadline(time.Now().Add(timeout))
 	if _, err = io.ReadFull(conn.rw, C2); err != nil {
 		return

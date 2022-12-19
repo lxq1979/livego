@@ -4,6 +4,7 @@
     1.启动服务：执行 livego 二进制文件启动 livego 服务；
     
     2.访问 http://localhost:8090/control/get?room=movie 获取一个房间的 channelkey(channelkey用于推流，movie用于播放).
+      訪問 http://127.0.0.1:7001/streams 獲得當前服務器publishers players
         
     3.推流: 通过RTMP协议推送视频流到地址 rtmp://localhost:1935/{appname}/{channelkey} (appname默认是live), 例如： 使用 ffmpeg -re -i demo.flv -c copy -f flv rtmp://localhost:1935/{appname}/{channelkey} 推流(下载demo flv);
     ffmpeg -re -i demo.flv -c copy -f flv rtmp://localhost:1935/live/rfBd56ti2SMtYvSgD5xAV0YU99zampta7Z7S575KLkIZ9PYk    
@@ -56,3 +57,9 @@
 
 ###2022-12-13
 #####整理UML 流程圖
+#####pio工具包
+    1.writer 數值轉字符串
+    2.reader 字符串轉數值
+    
+###2022-12-14
+####livego 作者 吴浩麟

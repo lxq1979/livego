@@ -33,7 +33,7 @@ func NewRtmpStream() *RtmpStream {
 
 func (rs *RtmpStream) HandleReader(r av.ReadCloser) {
 	info := r.Info()
-	log.Debugf("HandleReader: info[%v]", info)
+	log.Debugf("22 HandleReader: info[%v]", info)
 
 	var stream *Stream
 	i, ok := rs.streams.Load(info.Key)
@@ -317,7 +317,7 @@ func (s *Stream) TransStart() {
 	s.isStart = true
 	var p av.Packet
 
-	log.Debugf("TransStart: %v", s.info)
+	log.Debugf("30 TransStart: %v", s.info)
 
 	s.StartStaticPush()
 

@@ -2,11 +2,17 @@ package core
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestArea(t *testing.T) {
+	bs := []byte("123456789")
+	fmt.Println(bs[0:4])
+}
 
 func TestReader(t *testing.T) {
 	at := assert.New(t)
@@ -68,6 +74,7 @@ func TestReaderUintLE(t *testing.T) {
 		n, err := r.ReadUintLE(test.i)
 		at.Equal(err, nil, "test %d", test.i)
 		at.Equal(n, test.value, "test %d", test.i)
+		fmt.Printf("test.i:%d  n:%d test.value:%d\n", test.i, n, test.value)
 	}
 }
 

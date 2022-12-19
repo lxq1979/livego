@@ -84,6 +84,7 @@ func (s *Server) Serve(listener net.Listener) (err error) {
 		}
 	}()
 
+	//LXQ:當有新的推流進入時，會建立一個新的conn
 	for {
 		var netconn net.Conn
 		netconn, err = listener.Accept()
@@ -91,7 +92,7 @@ func (s *Server) Serve(listener net.Listener) (err error) {
 			return
 		}
 		conn := core.NewConn(netconn, 4*1024)
-		log.Debug("new client, connect remote: ", conn.RemoteAddr().String(),
+		log.Debug("16 new client, connect remote: ", conn.RemoteAddr().String(),
 			"local:", conn.LocalAddr().String())
 		go s.handleConn(conn)
 	}
@@ -103,6 +104,8 @@ func (s *Server) handleConn(conn *core.Conn) error {
 		conn.Close()
 		log.Error("handleConn HandshakeServer err: ", err)
 		return err
+	} else {
+		log.Debugf("18 handleConn Handshake OK,remote is %s", conn.Conn.RemoteAddr().String())
 	}
 	connServer := core.NewConnServer(conn)
 
@@ -121,7 +124,7 @@ func (s *Server) handleConn(conn *core.Conn) error {
 		return err
 	}
 
-	log.Debugf("handleConn: IsPublisher=%v", connServer.IsPublisher())
+	log.Debugf("22 handleConn: IsPublisher=%v", connServer.IsPublisher())
 	//LXQ:還有不是Publisher 連入的情況嗎？
 	if connServer.IsPublisher() {
 		if configure.Config.GetBool("rtmp_noauth") {
@@ -149,11 +152,11 @@ func (s *Server) handleConn(conn *core.Conn) error {
 		}
 		reader := NewVirReader(connServer)
 		s.handler.HandleReader(reader)
-		log.Debugf("new publisher: %+v", reader.Info())
+		log.Debugf("24 new publisher: %+v", reader.Info())
 
 		if s.getter != nil {
 			writeType := reflect.TypeOf(s.getter)
-			log.Debugf("handleConn:writeType=%v", writeType)
+			log.Debugf("26 handleConn:writeType=%v", writeType)
 			writer := s.getter.GetWriter(reader.Info())
 			s.handler.HandleWriter(writer)
 		}
@@ -162,8 +165,9 @@ func (s *Server) handleConn(conn *core.Conn) error {
 			s.handler.HandleWriter(flvWriter.GetWriter(reader.Info()))
 		}
 	} else {
+		//LXQ:我們如果走的是httpflv，是不會從這里來拉流
 		writer := NewVirWriter(connServer)
-		log.Debugf("new player: %+v", writer.Info())
+		log.Debugf(" new player: %+v", writer.Info())
 		s.handler.HandleWriter(writer)
 	}
 
