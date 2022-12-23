@@ -3,6 +3,7 @@ package cache
 import (
 	"github.com/gwuhaolin/livego/av"
 	"github.com/gwuhaolin/livego/configure"
+	"github.com/sirupsen/logrus"
 )
 
 type Cache struct {
@@ -22,8 +23,10 @@ func NewCache() *Cache {
 }
 
 func (cache *Cache) Write(p av.Packet) {
+
 	if p.IsMetadata {
 		cache.metadata.Write(&p)
+		logrus.Debug("Cache metadata ")
 		return
 	} else {
 		if !p.IsVideo {

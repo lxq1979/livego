@@ -13,7 +13,7 @@
     4.播放: 支持多种播放协议，播放地址如下:    
     RTMP:rtmp://localhost:1935/{appname}/movie
     FLV:http://127.0.0.1:7001/{appname}/movie.flv
-    HLS:http://127.0.0.1:7002/{appname}/movie.m3u8
+    HLS:http://127.0.0.1:7002/live/movie.m3u8
     
    FLV:http://127.0.0.1:7001/live/movie.flv
 

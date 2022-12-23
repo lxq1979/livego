@@ -54,6 +54,7 @@ func (conn *Conn) Read(c *ChunkStream) error {
 		// }
 		format := h >> 6
 		csid := h & 0x3f
+		//logrus.Debugf("format:%d , csid: %d ,h: %d",format,csid,h)
 		cs, ok := conn.chunks[csid]
 		if !ok {
 			cs = ChunkStream{}

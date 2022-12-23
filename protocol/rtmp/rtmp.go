@@ -391,6 +391,7 @@ func NewVirReader(conn StreamReadWriteCloser) *VirReader {
 	}
 }
 
+//LXQ length 為Data長度
 func (v *VirReader) SaveStatics(streamid uint32, length uint64, isVideoFlag bool) {
 	nowInMS := int64(time.Now().UnixNano() / 1e6)
 
@@ -414,6 +415,7 @@ func (v *VirReader) SaveStatics(streamid uint32, length uint64, isVideoFlag bool
 		v.ReadBWInfo.LastAudioDatainBytes = v.ReadBWInfo.AudioDatainBytes
 		v.ReadBWInfo.LastTimestamp = nowInMS
 	}
+	//log.Debugf("streamID:%d video bytes:%d audio bytes:%d lastTimestame:%d\n",v.ReadBWInfo.StreamId,v.ReadBWInfo.VideoDatainBytes,v.ReadBWInfo.AudioDatainBytes,v.ReadBWInfo.LastTimestamp)
 }
 
 func (v *VirReader) Read(p *av.Packet) (err error) {
