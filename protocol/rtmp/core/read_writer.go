@@ -30,6 +30,7 @@ func (rw *ReadWriter) ReadError() error {
 	return rw.readError
 }
 
+//LXQ:讀取n個byte數擾，每讀1個byte，向左移8位，接著讀后一個byte,英文字符，直接取的ASC碼
 func (rw *ReadWriter) ReadUintBE(n int) (uint32, error) {
 	if rw.readError != nil {
 		return 0, rw.readError

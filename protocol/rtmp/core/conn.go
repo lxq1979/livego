@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/binary"
+	"github.com/sirupsen/logrus"
 	"net"
 	"time"
 
@@ -47,14 +48,30 @@ func NewConn(c net.Conn, bufferSize int) *Conn {
 
 func (conn *Conn) Read(c *ChunkStream) error {
 	for {
+		//LXQ:從接收發送過來的1byte數據的chunk 的基本頭
 		h, _ := conn.rw.ReadUintBE(1)
 		// if err != nil {
 		// 	log.Println("read from conn error: ", err)
 		// 	return err
 		// }
+
+		//LXQ: 根據RTMP協議基本頭定議，前兩碼為format,直接右移去掉后6碼
 		format := h >> 6
+
+		//LXQ: 因為0x3f是 二進制的111111，前兩位會被0消掉，所以csid是byte的后6碼
 		csid := h & 0x3f
-		//logrus.Debugf("format:%d , csid: %d ,h: %d",format,csid,h)
+		/*
+			format:0 , csid: 4 ,h: 4
+			format:0 , csid: 6 ,h: 6
+			format:0 , csid: 4 ,h: 4
+			format:0 , csid: 6 ,h: 6
+			format:3 , csid: 6 ,h: 198
+			format:3 , csid: 6 ,h: 198
+			...
+			format:3 , csid: 6 ,h: 198
+			format:1 , csid: 6 ,h: 70
+		*/
+		logrus.Debugf("format:%d , csid: %d ,h: %d", format, csid, h)
 		cs, ok := conn.chunks[csid]
 		if !ok {
 			cs = ChunkStream{}

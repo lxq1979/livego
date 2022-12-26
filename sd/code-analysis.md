@@ -63,3 +63,20 @@
     
 ###2022-12-14
 ####livego 作者 吴浩麟
+
+
+
+###2022-12-26
+####rtmp chunkpacket Basic Header組成
+    format message type 標志位 fmt(2-bits)：用來標志消息類型，也被稱chunk type
+        Type 0 (FULL)                       0X00    Full 12bytes RTMP chunk header(absolute timestamp)
+        Type 1 (Relative large)             0x01    Relative 8bytes RTMP chunk header(stream ID is not included,timestamp delta)
+        Type 2 (Relative Timestamp only)    0x02    Relative 4byte (only timestamp delta)
+        Type 3 (Relative single byte)       0x03    Relative 1byte ,just the 1 byte in
+    csid(6-bits):
+        0X02控制流通道
+        0X03命令信息
+        0X05數據流通道
+        0X06視頻信道
+        0x07音頻信息
+        
